@@ -1,0 +1,76 @@
+syntax = "proto3";
+
+package image;
+
+
+service ImageService {
+  rpc UploadImage (stream UploadImageRequest) returns (UploadImageResponse);
+  rpc GetLastImageInfo (GetLastImageInfoRequest) returns (GetLastImageInfoResponse);
+  rpc GetOptimizedImage (GetOptimizedImageRequest) returns (GetOptimizedImageResponse);
+}
+
+message UploadImageRequest {
+  oneof data {
+    string userId = 1;
+    FileMetadata fileMetadata = 2;
+    bytes fileChunks = 3;
+  }
+}
+
+message UploadImageResponse {
+  oneof result {
+    Image image = 1;
+    bool isNull = 2;
+  }
+}
+
+message FileMetadata {
+  string fieldname = 1;
+  string originalname = 2;
+  string encoding = 3;
+  string mimetype = 4;
+  int32 size = 6;
+}
+
+// Сообщение для запроса информации о последнем изображении
+message GetLastImageInfoRequest {
+  string userId = 1;
+}
+
+message GetLastImageInfoResponse {
+  oneof result {
+    Image image = 1;
+    bool isNull = 2;
+  }
+}
+
+// Сообщение для обновления статуса изображения
+message UpdateImageStatusRequest {
+  string imageId = 1;            // ID изображения
+  string userId = 2;             // ID пользователя, которому принадлежит изображение
+  string processingStatus = 3;   // Новый статус обработки изображения (UPLOADED, PROCESSING, COMPLETED, FAILED)
+}
+
+message Image {
+  string id = 1;
+  string originalName = 2;
+  string generatedNameForOriginalsImage = 3;
+  string generatedNameForProcessedImage = 4;
+  string originalsImagePath = 5;
+  string processedImagePath = 6;
+  string processingStatus = 7;
+  string createdAt = 8;
+  string userId = 9;
+  int32 size = 10;
+}
+
+message GetOptimizedImageRequest {
+  string imageId = 1;
+}
+
+message GetOptimizedImageResponse {
+  oneof result {
+    bytes optimizedImage = 1;
+    bool isNull = 2;
+  }
+}

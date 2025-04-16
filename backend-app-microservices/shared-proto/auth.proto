@@ -1,0 +1,105 @@
+syntax = "proto3";
+
+package auth;
+
+service AuthService {
+    rpc Registration (RegistrationRequest) returns (RegistrationResponse);
+    rpc Authorization (AuthorizationRequest) returns (AuthorizationResponse);
+    rpc ConfirmEmail (ConfirmEmailRequest) returns (AuthorizationResponse);
+    rpc RefreshToken (RefreshTokenRequest) returns (AuthorizationResponse);
+    rpc ValidateAccessToken (ValidateAccessTokenRequest) returns (ValidateAccessTokenResponse);
+    rpc ResetPassword (ResetPasswordRequest) returns (ResetPasswordResponse);
+    rpc GetUser (GetUserRequest) returns (User);
+    rpc UpdateUser (UpdateUserRequest) returns (User);
+
+
+    rpc ResendConfirmEmailToken (ResendConfirmEmailTokenRequest) returns (ResendConfirmEmailTokenResponse);
+}
+
+// ResendConfirmEmailToken
+message ResendConfirmEmailTokenRequest {
+    string confirmEmail = 1;
+}
+
+message ResendConfirmEmailTokenResponse {
+    string message = 1;
+}
+
+// Registration
+message RegistrationRequest{
+    string email = 1;
+    string password = 2;
+}
+
+message RegistrationResponse {
+   string id = 1;
+   string email = 2;
+   bool isConfirmEmail = 3;
+   string confirmEmailToken = 4;
+   string refreshToken = 5;
+}
+
+// Authorization
+message AuthorizationRequest {
+    string email = 1;
+    string password = 2;
+}
+
+message AuthorizationResponse {
+    User user = 1;
+    string accessToken = 2;
+}
+
+// RefreshToken
+message RefreshTokenRequest {
+    string refreshToken = 1;
+}
+
+// ValidateAccessToken
+message ValidateAccessTokenRequest {
+    string accessToken = 1;
+}
+
+message ValidateAccessTokenResponse {
+    bool isValid = 1;
+    optional string userId = 2;
+}
+
+// ResetPassword
+message ResetPasswordRequest {
+    string email = 1;
+}
+
+message ResetPasswordResponse {
+    string message = 2;
+}
+
+
+// GetUser
+
+message GetUserRequest {
+    string id = 1;
+}
+
+// UpdateUser
+
+message UpdateUserRequest {
+    string id = 1;
+    string email = 2;
+    string password = 3;
+}
+
+// ConfirmEmail
+message ConfirmEmailRequest {
+    string confirmEmail = 1;
+    string confirmEmailToken = 2;
+}
+
+// User
+message User {
+   string id = 1;
+   string email = 2;
+   bool isConfirmEmail = 4;
+   string confirmEmailToken = 5;
+   string refreshToken = 6;
+}

@@ -1,0 +1,118 @@
+version: "3.9"
+
+services:
+  api-gateway:
+    build:
+      context: ./backend-app-microservices
+      dockerfile: api-gateway/Dockerfile
+    ports:
+      - "5000:5000"
+    env_file:
+      - ./backend-app-microservices/api-gateway/.env
+    depends_on:
+      - redis
+      - auth-service
+      - image-service
+    networks:
+      - app-network
+
+  auth-service:
+    build:
+      context: ./backend-app-microservices
+      dockerfile: auth-service/Dockerfile
+    ports:
+      - "3030:3030"
+      - "3031:3031"
+    env_file:
+      - ./backend-app-microservices/auth-service/.env
+    depends_on:
+      - auth-db
+    networks:
+      - app-network
+
+  image-service:
+    build:
+      context: ./backend-app-microservices
+      dockerfile: image-service/Dockerfile
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+    env_file:
+      - ./backend-app-microservices/image-service/.env
+    depends_on:
+      - image-db
+      - minio
+      - redis
+    networks:
+      - app-network
+
+  frontend-app:
+    build:
+      context: ./frontend-app
+    ports:
+      - "4173:4173"
+    env_file:
+      - ./frontend-app/.env
+    depends_on:
+      - api-gateway
+    networks:
+      - app-network
+
+  auth-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1
+      POSTGRES_DB: auth_database
+    volumes:
+      - auth-db-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - app-network
+
+  image-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1
+      POSTGRES_DB: image_database
+    volumes:
+      - image-db-data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    networks:
+      - app-network
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - app-network
+
+  minio:
+    image: minio/minio:latest
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio-data:/data
+    networks:
+      - app-network
+
+volumes:
+  auth-db-data:
+  image-db-data:
+  redis-data:
+  minio-data:
+
+networks:
+  app-network:
+    driver: bridge
