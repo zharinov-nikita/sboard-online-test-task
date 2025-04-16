@@ -1,4 +1,4 @@
-<video src="./preview.mp4" controls width="640" height="360" muted></video>
+![preview](https://github.com/zharinov-nikita/sboard-online-test-task/blob/master/preview.gif)
 
 # ⚠️ Посмотреть проект без локального запуска:
 
